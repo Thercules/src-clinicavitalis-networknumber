@@ -1,11 +1,14 @@
 package org.clinicavitalis.usuario.application.service;
 
+import org.clinicavitalis.shared.domain.vo.CPF;
 import org.clinicavitalis.shared.domain.vo.Email;
 import org.clinicavitalis.shared.domain.vo.Telefone;
 import org.clinicavitalis.usuario.application.dto.AuthTokenResponse;
+import org.clinicavitalis.usuario.application.dto.CreateUserRequest;
 import org.clinicavitalis.usuario.application.dto.LoginRequest;
 import org.clinicavitalis.usuario.application.dto.RegisterRequest;
 import org.clinicavitalis.usuario.application.dto.UsuarioResponse;
+import org.clinicavitalis.usuario.domain.entity.NivelDeAcesso;
 import org.clinicavitalis.usuario.domain.entity.Usuario;
 import org.clinicavitalis.usuario.domain.repository.UsuarioRepository;
 import org.clinicavitalis.usuario.domain.service.UsuarioDomainService;
@@ -177,6 +180,84 @@ public class AutenticacaoApplicationService {
         return jwtTokenProvider.generateToken(usuario);
     }
 
+    /**
+     * Use Case: Criar usuário com nível de acesso (apenas GM).
+     * 
+     * Fluxo:
+     * 1. Valida autorização (apenas GM pode criar)
+     * 2. Valida dados da requisição
+     * 3. Verifica se email já existe
+     * 4. Cria entidade Usuario com nível especificado
+     * 5. Persiste no banco
+     * 6. Retorna dados do usuário criado
+     * 
+     * @param request dados de criação do usuário com nível
+     * @param usuarioAutenticadoId ID do usuário autenticado (criador)
+     * @param nivelDoUsuarioAutenticado nível de acesso do usuário autenticado
+     * @return resposta com dados do usuário criado
+     */
+    @Transactional
+    public UsuarioResponse criarUsuarioComNivel(
+        @Valid @NotNull CreateUserRequest request,
+        Long usuarioAutenticadoId,
+        String nivelDoUsuarioAutenticado
+    ) {
+        // Validações
+        validarCriacaoDeUsuario(request);
+
+        // Validação de autorização: apenas GM pode criar usuários
+        NivelDeAcesso nivelAutenticado = NivelDeAcesso.fromCodigo(nivelDoUsuarioAutenticado);
+        if (!usuarioDomainService.validarHierarquiaDeAcesso(nivelAutenticado, nivelAutenticado)) {
+            throw new org.clinicavitalis.usuario.domain.exception.UsuarioDomainException(
+                "Apenas usuários GM podem criar outros usuários"
+            );
+        }
+
+        // Value Objects
+        Email email = Email.of(request.getEmail());
+
+        Telefone telefone = null;
+        if (request.getTelefone() != null && !request.getTelefone().isEmpty()) {
+            try {
+                telefone = Telefone.of(request.getTelefone());
+            } catch (IllegalArgumentException e) {
+                // telefone opcional, ignora erro de validação
+            }
+        }
+
+        CPF cpf = null;
+        if (request.getCpf() != null && !request.getCpf().isEmpty()) {
+            try {
+                cpf = CPF.of(request.getCpf());
+            } catch (IllegalArgumentException e) {
+                // CPF opcional, ignora erro de validação
+            }
+        }
+
+        // Hash da senha
+        String senhaHasheada = PasswordHasher.hash(request.getPassword());
+
+        // Parse do nível de acesso
+        NivelDeAcesso nivelDeAcesso = NivelDeAcesso.fromCodigo(request.getNivel_de_acesso());
+
+        // Cria entidade de domínio com nível específico
+        Usuario usuario = Usuario.criarComNivel(
+            email,
+            senhaHasheada,
+            request.getNome_completo(),
+            telefone,
+            cpf,
+            nivelDeAcesso,
+            usuarioAutenticadoId // registra quem criou o usuário (auditoria)
+        );
+
+        // Registra usando domain service (valida email único)
+        usuario = usuarioDomainService.registrarUsuarioComNivel(usuario);
+
+        // Retorna dados do usuário criado
+        return mapToUsuarioResponse(usuario);
+    }
+
     // ========== Métodos Privados ==========
 
     /**
@@ -189,6 +270,25 @@ public class AutenticacaoApplicationService {
 
         // Validações de senha forte
         validarForcaSenha(request.getPassword());
+    }
+
+    /**
+     * Valida dados de criação de usuário (com nível de acesso).
+     */
+    private void validarCriacaoDeUsuario(CreateUserRequest request) {
+        if (!request.getPassword().equals(request.getConfirmPassword())) {
+            throw new IllegalArgumentException("Senhas não coincidem");
+        }
+
+        // Validações de senha forte
+        validarForcaSenha(request.getPassword());
+
+        // Valida nível de acesso
+        try {
+            NivelDeAcesso.fromCodigo(request.getNivel_de_acesso());
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("Nível de acesso inválido: " + request.getNivel_de_acesso());
+        }
     }
 
     /**

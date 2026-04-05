@@ -88,6 +88,57 @@ public class Usuario {
     }
 
     /**
+     * Factory method para criar um novo usuário com nível de acesso específico.
+     * Utilizado por usuários GM para criar usuários com diferentes níveis.
+     * 
+     * @param email email do usuário
+     * @param senhaHasheada senha já hasheada (bcrypt)
+     * @param nomeCompleto nome completo
+     * @param telefone telefone (opcional)
+     * @param cpf CPF (opcional)
+     * @param nivelDeAcesso nível de acesso desejado
+     * @param criadoPor ID do usuário que criou este registro (para auditoria)
+     * @return nova instância de Usuario
+     */
+    public static Usuario criarComNivel(
+        Email email,
+        String senhaHasheada,
+        String nomeCompleto,
+        Telefone telefone,
+        CPF cpf,
+        NivelDeAcesso nivelDeAcesso,
+        Long criadoPor
+    ) {
+        Objects.requireNonNull(email, "Email é obrigatório");
+        Objects.requireNonNull(senhaHasheada, "Senha é obrigatória");
+        Objects.requireNonNull(nomeCompleto, "Nome completo é obrigatório");
+        Objects.requireNonNull(nivelDeAcesso, "Nível de acesso é obrigatório");
+
+        if (nomeCompleto.trim().isEmpty()) {
+            throw new IllegalArgumentException("Nome completo não pode ser vazio");
+        }
+
+        if (nomeCompleto.length() > 200) {
+            throw new IllegalArgumentException("Nome completo não pode exceder 200 caracteres");
+        }
+
+        Usuario usuario = new Usuario();
+        usuario.email = email;
+        usuario.senha = senhaHasheada;
+        usuario.nomeCompleto = nomeCompleto;
+        usuario.nivelDeAcesso = nivelDeAcesso;
+        usuario.dataCriacao = LocalDateTime.now();
+        usuario.dataAtualizacao = LocalDateTime.now();
+        usuario.ativo = true;
+        usuario.emailVerificado = false;
+        usuario.telefone = telefone;
+        usuario.cpf = cpf;
+        usuario.criadoPor = criadoPor;
+
+        return usuario;
+    }
+
+    /**
      * Factory method para reconectar um usuário carregado do banco de dados.
      */
     public static Usuario reconectar(

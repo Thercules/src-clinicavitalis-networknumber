@@ -2,7 +2,10 @@ package org.clinicavitalis.usuario.domain.service;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import org.clinicavitalis.shared.domain.vo.CPF;
 import org.clinicavitalis.shared.domain.vo.Email;
+import org.clinicavitalis.shared.domain.vo.Telefone;
+import org.clinicavitalis.usuario.domain.entity.NivelDeAcesso;
 import org.clinicavitalis.usuario.domain.entity.Usuario;
 import org.clinicavitalis.usuario.domain.exception.EmailAlreadyExistsException;
 import org.clinicavitalis.usuario.domain.repository.UsuarioRepository;
@@ -80,5 +83,43 @@ public class UsuarioDomainService {
                     "Usuario", id
                 )
             );
+    }
+
+    /**
+     * Registra um novo usuário com nível de acesso específico.
+     * Validações de autorização devem ser feitas pela Application Service.
+     * 
+     * Regras de negócio:
+     * - Email deve ser único
+     * - Nível de acesso deve ser válido
+     * 
+     * @param usuario usuario com nível de acesso pré-definido
+     * @return usuario registrado
+     * @throws EmailAlreadyExistsException se o email já existe
+     */
+    public Usuario registrarUsuarioComNivel(Usuario usuario) {
+        validarEmailUnico(usuario.getEmail());
+        return usuarioRepository.salvar(usuario);
+    }
+
+    /**
+     * Valida hierarquia de acesso entre dois usuários.
+     * Usada para verificar se um usuário pode criar outro com determinado nível.
+     * 
+     * Regra: Um usuário só pode criar usuários com nível igual ou inferior ao seu.
+     * A hierarquia é: GM > ADM > GESTOR > MEDICO > ENFERMEIRA > PACIENTE
+     * 
+     * @param nivelDoUsuarioLogado nível de acesso do usuário autenticado
+     * @param nivelDoUsuarioASerCriado nível de acesso do usuário a ser criado
+     * @return true se o usuário tem permissão
+     */
+    public boolean validarHierarquiaDeAcesso(NivelDeAcesso nivelDoUsuarioLogado, NivelDeAcesso nivelDoUsuarioASerCriado) {
+        // Apenas GM pode criar qualquer nível
+        if (nivelDoUsuarioLogado == NivelDeAcesso.GM) {
+            return true;
+        }
+
+        // Outros níveis não permitidos (segurança: apenas GM pode criar usuários)
+        return false;
     }
 }
