@@ -7,23 +7,12 @@ import org.clinicavitalis.usuario.domain.entity.NivelDeAcesso;
 import org.clinicavitalis.usuario.domain.entity.Usuario;
 import org.clinicavitalis.usuario.infrastructure.persistence.entity.UsuarioJpaEntity;
 
-/**
- * Mapper entre Usuario (Domínio) e UsuarioJpaEntity (Persistência).
- * 
- * Responsável por converter entre os dois modelos, mantendo-os desacoplados.
- */
 public class UsuarioMapper {
 
     private UsuarioMapper() {
-        // Private constructor to prevent instantiation
+
     }
 
-    /**
-     * Converte um Usuario do domínio para UsuarioJpaEntity.
-     * 
-     * @param usuario usuario do domínio
-     * @return entidade JPA
-     */
     public static UsuarioJpaEntity toJpaEntity(Usuario usuario) {
         UsuarioJpaEntity entity = new UsuarioJpaEntity();
 
@@ -59,12 +48,6 @@ public class UsuarioMapper {
         return entity;
     }
 
-    /**
-     * Converte uma UsuarioJpaEntity para Usuario do domínio.
-     * 
-     * @param entity entidade JPA
-     * @return usuario do domínio
-     */
     public static Usuario toDomain(UsuarioJpaEntity entity) {
         Email email = Email.of(entity.getEmail());
 
@@ -73,7 +56,7 @@ public class UsuarioMapper {
             try {
                 cpf = CPF.of(entity.getCpf());
             } catch (IllegalArgumentException e) {
-                // CPF inválido no banco, ignorar
+
             }
         }
 
@@ -82,7 +65,7 @@ public class UsuarioMapper {
             try {
                 telefone = Telefone.of(entity.getTelefone());
             } catch (IllegalArgumentException e) {
-                // Telefone inválido no banco, ignorar
+
             }
         }
 

@@ -3,13 +3,9 @@ package org.clinicavitalis.shared.domain.vo;
 import java.util.Objects;
 import java.util.regex.Pattern;
 
-/**
- * Value Object para Email.
- * Responsável pela validação e imutabilidade de emails.
- */
 public class Email {
 
-    private static final Pattern EMAIL_PATTERN = 
+    private static final Pattern EMAIL_PATTERN =
         Pattern.compile("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$");
 
     private final String value;
@@ -18,12 +14,6 @@ public class Email {
         this.value = value;
     }
 
-    /**
-     * Factory method para criar um Email validado.
-     * @param email endereço de email a validar
-     * @return Email value object
-     * @throws IllegalArgumentException se email inválido
-     */
     public static Email of(String email) {
         if (email == null || email.trim().isEmpty()) {
             throw new IllegalArgumentException("Email não pode ser vazio");

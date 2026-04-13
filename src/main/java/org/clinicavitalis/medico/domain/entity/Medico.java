@@ -5,34 +5,23 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 
-/**
- * Aggregate Root: Medico
- *
- * Representa o cadastro profissional de um médico vinculado a um usuário
- * com nivel_de_acesso = 'MEDICO'. O nome do médico é obtido da tabela
- * usuarios (usuarios.nome_completo) via join.
- */
 public class Medico {
 
     private Long id;
     private Long usuarioId;
     private String nomeCompleto;
 
-    // CRM
     private String crmNumero;
     private String crmEstado;
     private CrmSituacao crmSituacao;
     private LocalDate crmDataEmissao;
 
-    // Dados pessoais
     private LocalDate dataNascimento;
     private Sexo sexo;
     private String nacionalidade;
 
-    // Contato profissional
     private String emailProfissional;
 
-    // Endereço
     private String enderecoRua;
     private String enderecoNumero;
     private String enderecoBairro;
@@ -40,12 +29,10 @@ public class Medico {
     private String enderecoEstado;
     private String enderecoCep;
 
-    // Dados do card
     private List<String> especialidades;
     private String fotoUrl;
     private String localizacao;
 
-    // Agenda
     private List<Integer> diasAtendimento;
     private LocalTime horarioInicioManha;
     private LocalTime horarioFimManha;
@@ -54,16 +41,12 @@ public class Medico {
     private int intervaloConsultaMinutos;
     private int semanasDisponibilidade;
 
-    // Auditoria
     private LocalDateTime dataCriacao;
     private LocalDateTime dataAtualizacao;
     private Boolean ativo;
 
     private Medico() {}
 
-    /**
-     * Reconstrói o agregado a partir dos dados persistidos (usado pelo repositório).
-     */
     public static Medico reconectar(
             Long id,
             Long usuarioId,
@@ -129,8 +112,6 @@ public class Medico {
         medico.ativo = ativo;
         return medico;
     }
-
-    // ─── Getters ────────────────────────────────────────────────────────────
 
     public Long getId() { return id; }
     public Long getUsuarioId() { return usuarioId; }

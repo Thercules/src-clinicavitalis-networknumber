@@ -10,9 +10,6 @@ import org.clinicavitalis.medico.infrastructure.persistence.entity.MedicoJpaEnti
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Mapper estático: converte entre MedicoJpaEntity e o agregado de domínio Medico.
- */
 public class MedicoMapper {
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
@@ -68,8 +65,6 @@ public class MedicoMapper {
                 entity.getAtivo()
         );
     }
-
-    // ─── Helpers de deserialização JSON ─────────────────────────────────────
 
     private static List<String> parseStringArray(String json) {
         if (json == null || json.isBlank()) return new ArrayList<>();

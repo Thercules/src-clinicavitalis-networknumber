@@ -1,8 +1,5 @@
 package org.clinicavitalis.shared.domain.exception;
 
-/**
- * Exceção lançada quando uma entidade solicitada não é encontrada.
- */
 public class EntityNotFoundException extends DomainException {
 
     public EntityNotFoundException(String message) {

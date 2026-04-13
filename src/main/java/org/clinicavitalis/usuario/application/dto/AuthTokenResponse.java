@@ -2,9 +2,6 @@ package org.clinicavitalis.usuario.application.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-/**
- * DTO para resposta de autenticação com tokens.
- */
 public class AuthTokenResponse {
 
     private String token;
@@ -14,8 +11,6 @@ public class AuthTokenResponse {
 
     private UsuarioResponse usuario;
 
-    // ========== Construtores ==========
-
     public AuthTokenResponse() {
     }
 
@@ -24,8 +19,6 @@ public class AuthTokenResponse {
         this.refresh_token = refresh_token;
         this.usuario = usuario;
     }
-
-    // ========== Getters & Setters ==========
 
     public String getToken() {
         return token;

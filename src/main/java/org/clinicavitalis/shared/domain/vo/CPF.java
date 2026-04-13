@@ -2,10 +2,6 @@ package org.clinicavitalis.shared.domain.vo;
 
 import java.util.Objects;
 
-/**
- * Value Object para CPF.
- * Responsável pela validação e imutabilidade de CPF.
- */
 public class CPF {
 
     private final String value;
@@ -14,18 +10,11 @@ public class CPF {
         this.value = value;
     }
 
-    /**
-     * Factory method para criar um CPF validado.
-     * @param cpf número do CPF a validar
-     * @return CPF value object
-     * @throws IllegalArgumentException se CPF inválido
-     */
     public static CPF of(String cpf) {
         if (cpf == null || cpf.trim().isEmpty()) {
             throw new IllegalArgumentException("CPF não pode ser vazio");
         }
 
-        // Remove caracteres não numéricos
         String cleaned = cpf.replaceAll("\\D", "");
 
         if (cleaned.length() != 11) {
@@ -36,7 +25,6 @@ public class CPF {
             throw new IllegalArgumentException("CPF inválido: " + cpf);
         }
 
-        // Formata no padrão XXX.XXX.XXX-XX
         String formatted = String.format(
             "%s.%s.%s-%s",
             cleaned.substring(0, 3),
@@ -48,11 +36,8 @@ public class CPF {
         return new CPF(formatted);
     }
 
-    /**
-     * Valida CPF utilizando algoritmo de dígito verificador.
-     */
     private static boolean isValidCPF(String cpf) {
-        // CPFs com todos os dígitos iguais são inválidos
+
         if (cpf.matches("(\\d)\\1{10}")) {
             return false;
         }
@@ -61,7 +46,6 @@ public class CPF {
             int sum = 0;
             int remainder;
 
-            // Calcula primeiro dígito verificador
             for (int i = 1; i <= 9; i++) {
                 sum += Character.getNumericValue(cpf.charAt(i - 1)) * (11 - i);
             }
@@ -77,7 +61,6 @@ public class CPF {
 
             sum = 0;
 
-            // Calcula segundo dígito verificador
             for (int i = 1; i <= 10; i++) {
                 sum += Character.getNumericValue(cpf.charAt(i - 1)) * (12 - i);
             }

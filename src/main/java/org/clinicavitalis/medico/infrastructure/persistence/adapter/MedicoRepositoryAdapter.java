@@ -11,10 +11,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-/**
- * Adapter (implementação do Port MedicoRepository).
- * Faz a ponte entre o domínio e a infraestrutura JPA/Panache.
- */
 @ApplicationScoped
 public class MedicoRepositoryAdapter implements MedicoRepository {
 

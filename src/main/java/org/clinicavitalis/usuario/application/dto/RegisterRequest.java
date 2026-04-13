@@ -4,9 +4,6 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
-/**
- * DTO para requisição de registro/cadastro de novo usuário.
- */
 public class RegisterRequest {
 
     @NotBlank(message = "Email é obrigatório")
@@ -27,8 +24,6 @@ public class RegisterRequest {
     @Size(max = 20, message = "Telefone deve ter no máximo 20 caracteres")
     private String telefone;
 
-    // ========== Construtores ==========
-
     public RegisterRequest() {
     }
 
@@ -39,8 +34,6 @@ public class RegisterRequest {
         this.nome_completo = nome_completo;
         this.telefone = telefone;
     }
-
-    // ========== Getters & Setters ==========
 
     public String getEmail() {
         return email;

@@ -2,10 +2,6 @@ package org.clinicavitalis.shared.domain.vo;
 
 import java.util.Objects;
 
-/**
- * Value Object para Telefone.
- * Responsável pela validação e imutabilidade de números de telefone.
- */
 public class Telefone {
 
     private final String value;
@@ -14,18 +10,11 @@ public class Telefone {
         this.value = value;
     }
 
-    /**
-     * Factory method para criar um Telefone validado.
-     * @param telefone número de telefone a validar
-     * @return Telefone value object
-     * @throws IllegalArgumentException se telefone inválido
-     */
     public static Telefone of(String telefone) {
         if (telefone == null || telefone.trim().isEmpty()) {
             throw new IllegalArgumentException("Telefone não pode ser vazio");
         }
 
-        // Remove caracteres não numéricos e parênteses
         String cleaned = telefone.replaceAll("[^0-9]", "");
 
         if (cleaned.length() < 10 || cleaned.length() > 11) {

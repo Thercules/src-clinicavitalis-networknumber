@@ -7,9 +7,6 @@ import jakarta.ws.rs.core.MultivaluedMap;
 import jakarta.ws.rs.ext.Provider;
 import java.io.IOException;
 
-/**
- * Filtro CORS para permitir requisições do frontend.
- */
 @Provider
 public class CorsFilter implements ContainerResponseFilter {
 
@@ -21,12 +18,10 @@ public class CorsFilter implements ContainerResponseFilter {
     public void filter(ContainerRequestContext request, ContainerResponseContext response) throws IOException {
         String origin = request.getHeaderString("Origin");
 
-        // Validar se a origin está na lista de permitidas
         if (origin != null && isOriginAllowed(origin)) {
             response.getHeaders().add("Access-Control-Allow-Origin", origin);
         }
 
-        // Headers padrão CORS
         MultivaluedMap<String, Object> headers = response.getHeaders();
         headers.add("Access-Control-Allow-Methods", ALLOWED_METHODS);
         headers.add("Access-Control-Allow-Headers", ALLOWED_HEADERS);

@@ -22,19 +22,6 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import org.eclipse.microprofile.faulttolerance.CircuitBreaker;
 
-/**
- * Application Service: Autenticação
- * 
- * Orquestra os Use Cases de autenticação:
- * - Login
- * - Registro
- * - Refresh Token
- * 
- * Coordena entre:
- * - Domain Services (lógica de negócio)
- * - Repositories (persistência)
- * - Security utilities (criptografia, JWT)
- */
 @ApplicationScoped
 public class AutenticacaoApplicationService {
 
@@ -47,20 +34,6 @@ public class AutenticacaoApplicationService {
     @Inject
     JwtTokenProvider jwtTokenProvider;
 
-    /**
-     * Use Case: Registrar novo usuário.
-     * 
-     * Fluxo:
-     * 1. Valida dados da requisição
-     * 2. Verifica se email já existe
-     * 3. Cria entidade Usuario do domínio
-     * 4. Persiste no banco
-     * 5. Gera tokens JWT
-     * 6. Retorna resposta com tokens
-     * 
-     * @param request dados de registro
-     * @return resposta com tokens e dados do usuário
-     */
     @Transactional
     @CircuitBreaker(
         requestVolumeThreshold = 4,
@@ -72,10 +45,9 @@ public class AutenticacaoApplicationService {
         }
     )
     public AuthTokenResponse registrar(@Valid @NotNull RegisterRequest request) {
-        // Validações
+
         validarRegistro(request);
 
-        // Value Objects
         Email email = Email.of(request.getEmail());
 
         Telefone telefone = null;
@@ -83,51 +55,31 @@ public class AutenticacaoApplicationService {
             try {
                 telefone = Telefone.of(request.getTelefone());
             } catch (IllegalArgumentException e) {
-                // telefone opcional, ignora erro de validação
+
             }
         }
 
-        // Hash da senha
         String senhaHasheada = PasswordHasher.hash(request.getPassword());
 
-        // Cria entidade de domínio
         Usuario usuario = Usuario.criar(
             email,
             senhaHasheada,
             request.getNome_completo(),
             telefone,
-            null // CPF não é necessário para registro inicial
+            null
         );
 
-        // Registra usando domain service (valida email único)
         usuario = usuarioDomainService.registrarNovoUsuario(usuario);
 
-        // Gera tokens
         String token = jwtTokenProvider.generateToken(usuario);
         String refreshToken = jwtTokenProvider.generateRefreshToken(usuario);
 
-        // Monta resposta
         UsuarioResponse usuarioResponse = mapToUsuarioResponse(usuario);
         AuthTokenResponse response = new AuthTokenResponse(token, refreshToken, usuarioResponse);
 
         return response;
     }
 
-    /**
-     * Use Case: Fazer login.
-     * 
-     * Fluxo:
-     * 1. Valida dados da requisição
-     * 2. Busca usuário por email
-     * 3. Verifica se usuário está ativo
-     * 4. Verifica senha
-     * 5. Atualiza último acesso
-     * 6. Gera tokens JWT
-     * 7. Retorna resposta com tokens
-     * 
-     * @param request dados de login
-     * @return resposta com tokens e dados do usuário
-     */
     @Transactional
     @CircuitBreaker(
         requestVolumeThreshold = 4,
@@ -140,44 +92,33 @@ public class AutenticacaoApplicationService {
         }
     )
     public AuthTokenResponse login(@Valid @NotNull LoginRequest request) {
-        // Busca usuário
+
         Email email = Email.of(request.getEmail());
         Usuario usuario = usuarioDomainService.encontrarPorEmail(email);
 
-        // Valida se usuário está ativo
         if (!usuario.getAtivo()) {
             throw new org.clinicavitalis.usuario.domain.exception.UsuarioDomainException(
                 "Usuário inativo"
             );
         }
 
-        // Verifica senha
         usuario.verificarSenha(
             request.getPassword(),
             PasswordHasher::verify
         );
 
-        // Atualiza último acesso
         usuario.marcarUltimoAcesso();
         usuario = usuarioRepository.atualizar(usuario);
 
-        // Gera tokens
         String token = jwtTokenProvider.generateToken(usuario);
         String refreshToken = jwtTokenProvider.generateRefreshToken(usuario);
 
-        // Monta resposta
         UsuarioResponse usuarioResponse = mapToUsuarioResponse(usuario);
         AuthTokenResponse response = new AuthTokenResponse(token, refreshToken, usuarioResponse);
 
         return response;
     }
 
-    /**
-     * Use Case: Renovar token (Refresh).
-     * 
-     * @param refreshToken refresh token fornecido
-     * @return novo access token
-     */
     @CircuitBreaker(
         requestVolumeThreshold = 4,
         failureRatio = 0.5,
@@ -185,7 +126,7 @@ public class AutenticacaoApplicationService {
         skipOn = { org.clinicavitalis.usuario.domain.exception.UsuarioDomainException.class }
     )
     public String renovarToken(String refreshToken) {
-        // Valida refresh token
+
         if (!jwtTokenProvider.isTokenValid(refreshToken)) {
             throw new org.clinicavitalis.usuario.domain.exception.UsuarioDomainException(
                 "Refresh token inválido ou expirado"
@@ -198,30 +139,12 @@ public class AutenticacaoApplicationService {
             );
         }
 
-        // Busca usuário
         Long usuarioId = jwtTokenProvider.getIdFromToken(refreshToken);
         Usuario usuario = usuarioDomainService.encontrarPorId(usuarioId);
 
-        // Gera novo token
         return jwtTokenProvider.generateToken(usuario);
     }
 
-    /**
-     * Use Case: Criar usuário com nível de acesso (apenas GM).
-     * 
-     * Fluxo:
-     * 1. Valida autorização (apenas GM pode criar)
-     * 2. Valida dados da requisição
-     * 3. Verifica se email já existe
-     * 4. Cria entidade Usuario com nível especificado
-     * 5. Persiste no banco
-     * 6. Retorna dados do usuário criado
-     * 
-     * @param request dados de criação do usuário com nível
-     * @param usuarioAutenticadoId ID do usuário autenticado (criador)
-     * @param nivelDoUsuarioAutenticado nível de acesso do usuário autenticado
-     * @return resposta com dados do usuário criado
-     */
     @Transactional
     @CircuitBreaker(
         requestVolumeThreshold = 4,
@@ -238,10 +161,9 @@ public class AutenticacaoApplicationService {
         Long usuarioAutenticadoId,
         String nivelDoUsuarioAutenticado
     ) {
-        // Validações
+
         validarCriacaoDeUsuario(request);
 
-        // Validação de autorização: apenas GM pode criar usuários
         NivelDeAcesso nivelAutenticado = NivelDeAcesso.fromCodigo(nivelDoUsuarioAutenticado);
         if (!usuarioDomainService.validarHierarquiaDeAcesso(nivelAutenticado, nivelAutenticado)) {
             throw new org.clinicavitalis.usuario.domain.exception.UsuarioDomainException(
@@ -249,7 +171,6 @@ public class AutenticacaoApplicationService {
             );
         }
 
-        // Value Objects
         Email email = Email.of(request.getEmail());
 
         Telefone telefone = null;
@@ -257,7 +178,7 @@ public class AutenticacaoApplicationService {
             try {
                 telefone = Telefone.of(request.getTelefone());
             } catch (IllegalArgumentException e) {
-                // telefone opcional, ignora erro de validação
+
             }
         }
 
@@ -266,17 +187,14 @@ public class AutenticacaoApplicationService {
             try {
                 cpf = CPF.of(request.getCpf());
             } catch (IllegalArgumentException e) {
-                // CPF opcional, ignora erro de validação
+
             }
         }
 
-        // Hash da senha
         String senhaHasheada = PasswordHasher.hash(request.getPassword());
 
-        // Parse do nível de acesso
         NivelDeAcesso nivelDeAcesso = NivelDeAcesso.fromCodigo(request.getNivel_de_acesso());
 
-        // Cria entidade de domínio com nível específico
         Usuario usuario = Usuario.criarComNivel(
             email,
             senhaHasheada,
@@ -284,42 +202,29 @@ public class AutenticacaoApplicationService {
             telefone,
             cpf,
             nivelDeAcesso,
-            usuarioAutenticadoId // registra quem criou o usuário (auditoria)
+            usuarioAutenticadoId
         );
 
-        // Registra usando domain service (valida email único)
         usuario = usuarioDomainService.registrarUsuarioComNivel(usuario);
 
-        // Retorna dados do usuário criado
         return mapToUsuarioResponse(usuario);
     }
 
-    // ========== Métodos Privados ==========
-
-    /**
-     * Valida dados de registro.
-     */
     private void validarRegistro(RegisterRequest request) {
         if (!request.getPassword().equals(request.getConfirmPassword())) {
             throw new IllegalArgumentException("Senhas não coincidem");
         }
 
-        // Validações de senha forte
         validarForcaSenha(request.getPassword());
     }
 
-    /**
-     * Valida dados de criação de usuário (com nível de acesso).
-     */
     private void validarCriacaoDeUsuario(CreateUserRequest request) {
         if (!request.getPassword().equals(request.getConfirmPassword())) {
             throw new IllegalArgumentException("Senhas não coincidem");
         }
 
-        // Validações de senha forte
         validarForcaSenha(request.getPassword());
 
-        // Valida nível de acesso
         try {
             NivelDeAcesso.fromCodigo(request.getNivel_de_acesso());
         } catch (IllegalArgumentException e) {
@@ -327,10 +232,6 @@ public class AutenticacaoApplicationService {
         }
     }
 
-    /**
-     * Valida força da senha.
-     * Padrão: mínimo 8 caracteres, letra maiúscula, minúscula, número.
-     */
     private void validarForcaSenha(String senha) {
         if (senha == null || senha.length() < 8) {
             throw new IllegalArgumentException("Senha deve ter no mínimo 8 caracteres");
@@ -349,9 +250,6 @@ public class AutenticacaoApplicationService {
         }
     }
 
-    /**
-     * Mapeia Usuario para UsuarioResponse.
-     */
     private UsuarioResponse mapToUsuarioResponse(Usuario usuario) {
         return new UsuarioResponse(
             usuario.getId(),

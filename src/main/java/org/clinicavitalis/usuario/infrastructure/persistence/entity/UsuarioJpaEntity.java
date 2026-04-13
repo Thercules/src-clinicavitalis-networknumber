@@ -3,17 +3,6 @@ package org.clinicavitalis.usuario.infrastructure.persistence.entity;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
-/**
- * Entidade JPA: UsuarioJpaEntity
- * 
- * Representa a persistência da entidade Usuario no banco de dados.
- * Esta é uma entidade técnica (Adapter) e não deve conter lógica de negócio.
- * 
- * Separa-se da entidade de domínio para:
- * - Evitar acoplamento ao framework JPA
- * - Permitir diferentes estratégias de persistência
- * - Facilitar testes unitários do domínio
- */
 @Entity
 @Table(name = "usuarios", indexes = {
     @Index(name = "idx_email", columnList = "email"),
@@ -73,8 +62,6 @@ public class UsuarioJpaEntity {
     @Column(name = "criado_por")
     private Long criadoPor;
 
-    // ========== Construtores ==========
-
     public UsuarioJpaEntity() {
     }
 
@@ -111,8 +98,6 @@ public class UsuarioJpaEntity {
         this.verificacaoEmailToken = verificacaoEmailToken;
         this.criadoPor = criadoPor;
     }
-
-    // ========== Getters & Setters ==========
 
     public Long getId() {
         return id;
@@ -242,9 +227,6 @@ public class UsuarioJpaEntity {
         this.criadoPor = criadoPor;
     }
 
-    /**
-     * Enum para o nível de acesso (para persistência JPA).
-     */
     public enum UsuarioNivelDeAcesso {
         GM, ADM, GESTOR, MEDICO, ENFERMEIRA, PACIENTE
     }

@@ -15,12 +15,6 @@ import org.eclipse.microprofile.faulttolerance.exceptions.CircuitBreakerOpenExce
 
 import java.util.List;
 
-/**
- * REST Resource: Médicos
- *
- * Endpoint:
- * - GET /api/medicos  →  lista todos os médicos ativos com seus dados de agenda
- */
 @Path("/api/medicos")
 @Produces(MediaType.APPLICATION_JSON)
 public class MedicoResource {
@@ -28,25 +22,6 @@ public class MedicoResource {
     @Inject
     MedicoApplicationService medicoApplicationService;
 
-    /**
-     * GET /api/medicos
-     *
-     * Lista todos os médicos ativos com nome (via join com usuarios),
-     * especialidades, dados de agenda e data limite de agendamento.
-     *
-     * Response (200 OK):
-     * {
-     *   "sucesso": true,
-     *   "mensagem": "Médicos listados com sucesso",
-     *   "dados": [ { ... }, ... ]
-     * }
-     *
-     * Response (503 Service Unavailable — Circuit Breaker aberto):
-     * {
-     *   "sucesso": false,
-     *   "mensagem": "Serviço temporariamente indisponível. Tente novamente em instantes."
-     * }
-     */
     @GET
     public Response listarMedicos() {
         try {

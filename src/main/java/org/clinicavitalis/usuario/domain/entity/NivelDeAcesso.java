@@ -1,9 +1,5 @@
 package org.clinicavitalis.usuario.domain.entity;
 
-/**
- * Enum para os níveis de acesso/roles no sistema.
- * Define a hierarquia de permissões dos usuários.
- */
 public enum NivelDeAcesso {
     GM("gm", "Game Master/Dono"),
     ADM("adm", "Administrador"),
@@ -28,12 +24,9 @@ public enum NivelDeAcesso {
         return descricao;
     }
 
-    /**
-     * Factory method para converter string para enum.
-     */
     public static NivelDeAcesso fromCodigo(String codigo) {
         if (codigo == null) {
-            return PACIENTE; // default
+            return PACIENTE;
         }
 
         for (NivelDeAcesso nivel : values()) {

@@ -7,10 +7,6 @@ import org.clinicavitalis.medico.domain.repository.MedicoRepository;
 
 import java.util.List;
 
-/**
- * Domain Service: regras de negócio relacionadas ao Medico
- * que não pertencem a nenhuma entidade específica.
- */
 @ApplicationScoped
 public class MedicoDomainService {
 

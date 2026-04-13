@@ -7,12 +7,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 
-/**
- * JPA Entity: medicos
- *
- * Mapeia a tabela medicos. O nome do médico (nome_completo) é obtido
- * via join lazy com a tabela usuarios através do relacionamento @ManyToOne.
- */
 @Entity
 @Table(name = "medicos", indexes = {
         @Index(name = "idx_medicos_usuario",    columnList = "usuario_id"),
@@ -76,7 +70,6 @@ public class MedicoJpaEntity {
     @Column(name = "endereco_cep", length = 9, nullable = false)
     private String enderecoCep;
 
-    // JSON armazenado como String — conversão via MedicoMapper
     @Column(name = "especialidades", columnDefinition = "JSON", nullable = false)
     private String especialidades;
 
@@ -86,7 +79,6 @@ public class MedicoJpaEntity {
     @Column(name = "localizacao", length = 200)
     private String localizacao;
 
-    // JSON armazenado como String — conversão via MedicoMapper
     @Column(name = "dias_atendimento", columnDefinition = "JSON", nullable = false)
     private String diasAtendimento;
 
@@ -121,8 +113,6 @@ public class MedicoJpaEntity {
 
     public MedicoJpaEntity() {}
 
-    // ─── Enums internos espelhando o banco ──────────────────────────────────
-
     public enum CrmSituacaoJpa {
         ATIVO, SUSPENSO, CANCELADO, INATIVO
     }
@@ -130,8 +120,6 @@ public class MedicoJpaEntity {
     public enum SexoJpa {
         MASCULINO, FEMININO, OUTRO
     }
-
-    // ─── Getters & Setters ───────────────────────────────────────────────────
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }

@@ -5,12 +5,6 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
-/**
- * DTO para requisição de criação de usuário com nível de acesso.
- * 
- * Uso: Apenas por usuários GM para criar usuários com diferentes níveis.
- * Permite definir o nível de acesso explicitamente.
- */
 public class CreateUserRequest {
 
     @NotBlank(message = "Email é obrigatório")
@@ -39,13 +33,11 @@ public class CreateUserRequest {
     @JsonProperty("nivel_de_acesso")
     private String nivel_de_acesso;
 
-    // ========== Construtores ==========
-
     public CreateUserRequest() {
     }
 
-    public CreateUserRequest(String email, String password, String confirmPassword, 
-                           String nome_completo, String telefone, String cpf, 
+    public CreateUserRequest(String email, String password, String confirmPassword,
+                           String nome_completo, String telefone, String cpf,
                            String nivel_de_acesso) {
         this.email = email;
         this.password = password;
@@ -55,8 +47,6 @@ public class CreateUserRequest {
         this.cpf = cpf;
         this.nivel_de_acesso = nivel_de_acesso;
     }
-
-    // ========== Getters & Setters ==========
 
     public String getEmail() {
         return email;

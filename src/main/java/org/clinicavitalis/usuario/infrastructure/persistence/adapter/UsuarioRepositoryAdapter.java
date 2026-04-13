@@ -11,14 +11,6 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import java.util.Optional;
 
-/**
- * Adapter: Implementação de UsuarioRepository usando Hibernate/JPA.
- * 
- * Implementa o port UsuarioRepository do domínio.
- * Realiza a conversão entre entidades de domínio e entidades JPA.
- * 
- * Este é um Adapter na arquitetura hexagonal.
- */
 @ApplicationScoped
 public class UsuarioRepositoryAdapter implements UsuarioRepository {
 
@@ -30,7 +22,7 @@ public class UsuarioRepositoryAdapter implements UsuarioRepository {
         UsuarioJpaEntity entity = UsuarioMapper.toJpaEntity(usuario);
         jpaRepository.persist(entity);
         jpaRepository.flush();
-        // Após persist, a entidade tem o ID gerado
+
         return UsuarioMapper.toDomain(entity);
     }
 

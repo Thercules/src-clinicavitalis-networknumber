@@ -2,9 +2,6 @@ package org.clinicavitalis.usuario.application.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-/**
- * DTO para resposta de autenticação (Login/Register).
- */
 public class UsuarioResponse {
 
     private Long id;
@@ -20,8 +17,6 @@ public class UsuarioResponse {
     @JsonProperty("email_verificado")
     private Boolean emailVerificado;
 
-    // ========== Construtores ==========
-
     public UsuarioResponse() {
     }
 
@@ -32,8 +27,6 @@ public class UsuarioResponse {
         this.nivelDeAcesso = nivelDeAcesso;
         this.emailVerificado = emailVerificado;
     }
-
-    // ========== Getters & Setters ==========
 
     public Long getId() {
         return id;
