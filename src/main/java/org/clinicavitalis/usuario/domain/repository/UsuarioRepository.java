@@ -16,8 +16,4 @@ public interface UsuarioRepository {
     boolean existePorEmail(Email email);
 
     Usuario atualizar(Usuario usuario);
-
-    void remover(Long id);
-
-    void removerPorEmail(Email email);
 }

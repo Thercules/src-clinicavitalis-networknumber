@@ -8,7 +8,7 @@ import org.clinicavitalis.medico.domain.repository.MedicoRepository;
 import java.util.List;
 
 @ApplicationScoped
-public class MedicoDomainService {
+public class MedicoDomainService implements MedicoService {
 
     @Inject
     MedicoRepository medicoRepository;

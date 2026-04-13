@@ -6,6 +6,8 @@ import org.clinicavitalis.medico.domain.entity.CrmSituacao;
 import org.clinicavitalis.medico.domain.entity.Medico;
 import org.clinicavitalis.medico.domain.entity.Sexo;
 import org.clinicavitalis.medico.infrastructure.persistence.entity.MedicoJpaEntity;
+import org.clinicavitalis.shared.domain.vo.Email;
+import org.clinicavitalis.shared.domain.vo.Endereco;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,13 +26,16 @@ public class MedicoMapper {
         List<String> especialidades = parseStringArray(entity.getEspecialidades());
         List<Integer> diasAtendimento = parseIntArray(entity.getDiasAtendimento());
 
-        CrmSituacao crmSituacao = (entity.getCrmSituacao() != null)
-                ? CrmSituacao.valueOf(entity.getCrmSituacao().name())
-                : null;
+        Email emailProfissional = Email.of(entity.getEmailProfissional());
 
-        Sexo sexo = (entity.getSexo() != null)
-                ? Sexo.valueOf(entity.getSexo().name())
-                : null;
+        Endereco endereco = Endereco.of(
+                entity.getEnderecoRua(),
+                entity.getEnderecoNumero(),
+                entity.getEnderecoBairro(),
+                entity.getEnderecoCidade(),
+                entity.getEnderecoEstado(),
+                entity.getEnderecoCep()
+        );
 
         return Medico.reconectar(
                 entity.getId(),
@@ -38,18 +43,13 @@ public class MedicoMapper {
                 nomeCompleto,
                 entity.getCrmNumero(),
                 entity.getCrmEstado(),
-                crmSituacao,
+                entity.getCrmSituacao(),
                 entity.getCrmDataEmissao(),
                 entity.getDataNascimento(),
-                sexo,
+                entity.getSexo(),
                 entity.getNacionalidade(),
-                entity.getEmailProfissional(),
-                entity.getEnderecoRua(),
-                entity.getEnderecoNumero(),
-                entity.getEnderecoBairro(),
-                entity.getEnderecoCidade(),
-                entity.getEnderecoEstado(),
-                entity.getEnderecoCep(),
+                emailProfissional,
+                endereco,
                 especialidades,
                 entity.getFotoUrl(),
                 entity.getLocalizacao(),

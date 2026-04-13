@@ -3,13 +3,15 @@ package org.clinicavitalis.usuario.infrastructure.http;
 import org.clinicavitalis.shared.application.dto.ApiResponse;
 import org.clinicavitalis.shared.domain.exception.ServicoIndisponivelException;
 import org.clinicavitalis.usuario.application.dto.AuthTokenResponse;
+import org.clinicavitalis.usuario.application.dto.RefreshTokenRequest;
+import org.clinicavitalis.usuario.application.dto.RefreshTokenResponse;
 import org.eclipse.microprofile.faulttolerance.exceptions.CircuitBreakerOpenException;
 import org.clinicavitalis.usuario.application.dto.CreateUserRequest;
 import org.clinicavitalis.usuario.application.dto.LoginRequest;
 import org.clinicavitalis.usuario.application.dto.RegisterRequest;
 import org.clinicavitalis.usuario.application.dto.UsuarioResponse;
 import org.clinicavitalis.usuario.application.service.AutenticacaoApplicationService;
-import org.clinicavitalis.usuario.infrastructure.security.JwtTokenProvider;
+import org.clinicavitalis.usuario.domain.port.TokenProvider;
 
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
@@ -30,7 +32,7 @@ public class AutenticacaoResource {
     AutenticacaoApplicationService autenticacaoService;
 
     @Inject
-    JwtTokenProvider jwtTokenProvider;
+    TokenProvider tokenProvider;
 
     @POST
     @Path("/login")
@@ -127,11 +129,11 @@ public class AutenticacaoResource {
     @Path("/refresh-token")
     public Response refreshToken(RefreshTokenRequest request) {
         try {
-            String novoToken = autenticacaoService.renovarToken(request.getRefresh_token());
+            String novoToken = autenticacaoService.renovarToken(request.getRefreshToken());
 
             RefreshTokenResponse data = new RefreshTokenResponse(
                 novoToken,
-                request.getRefresh_token()
+                request.getRefreshToken()
             );
 
             ApiResponse<RefreshTokenResponse> response = ApiResponse.success(
@@ -187,7 +189,7 @@ public class AutenticacaoResource {
 
             String token = authHeader.replace("Bearer ", "").trim();
 
-            if (!jwtTokenProvider.isTokenValid(token)) {
+            if (!tokenProvider.isTokenValid(token)) {
                 ApiResponse<Object> response = ApiResponse.error("Token inválido ou expirado");
                 return Response
                     .status(Response.Status.UNAUTHORIZED)
@@ -195,8 +197,8 @@ public class AutenticacaoResource {
                     .build();
             }
 
-            Long usuarioId = jwtTokenProvider.getIdFromToken(token);
-            String nivelDoUsuario = jwtTokenProvider.getNivelFromToken(token);
+            Long usuarioId = tokenProvider.getIdFromToken(token);
+            String nivelDoUsuario = tokenProvider.getNivelFromToken(token);
 
             UsuarioResponse usuarioCriado = autenticacaoService.criarUsuarioComNivel(
                 request,
@@ -252,54 +254,6 @@ public class AutenticacaoResource {
                 .status(Response.Status.INTERNAL_SERVER_ERROR)
                 .entity(response)
                 .build();
-        }
-    }
-
-    public static class RefreshTokenRequest {
-        private String refresh_token;
-
-        public RefreshTokenRequest() {
-        }
-
-        public RefreshTokenRequest(String refresh_token) {
-            this.refresh_token = refresh_token;
-        }
-
-        public String getRefresh_token() {
-            return refresh_token;
-        }
-
-        public void setRefresh_token(String refresh_token) {
-            this.refresh_token = refresh_token;
-        }
-    }
-
-    public static class RefreshTokenResponse {
-        private String token;
-        private String refresh_token;
-
-        public RefreshTokenResponse() {
-        }
-
-        public RefreshTokenResponse(String token, String refresh_token) {
-            this.token = token;
-            this.refresh_token = refresh_token;
-        }
-
-        public String getToken() {
-            return token;
-        }
-
-        public void setToken(String token) {
-            this.token = token;
-        }
-
-        public String getRefresh_token() {
-            return refresh_token;
-        }
-
-        public void setRefresh_token(String refresh_token) {
-            this.refresh_token = refresh_token;
         }
     }
 }

@@ -2,16 +2,14 @@ package org.clinicavitalis.usuario.domain.service;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-import org.clinicavitalis.shared.domain.vo.CPF;
 import org.clinicavitalis.shared.domain.vo.Email;
-import org.clinicavitalis.shared.domain.vo.Telefone;
 import org.clinicavitalis.usuario.domain.entity.NivelDeAcesso;
 import org.clinicavitalis.usuario.domain.entity.Usuario;
 import org.clinicavitalis.usuario.domain.exception.EmailAlreadyExistsException;
 import org.clinicavitalis.usuario.domain.repository.UsuarioRepository;
 
 @ApplicationScoped
-public class UsuarioDomainService {
+public class UsuarioDomainService implements UsuarioService {
 
     @Inject
     UsuarioRepository usuarioRepository;
@@ -53,11 +51,6 @@ public class UsuarioDomainService {
     }
 
     public boolean validarHierarquiaDeAcesso(NivelDeAcesso nivelDoUsuarioLogado, NivelDeAcesso nivelDoUsuarioASerCriado) {
-
-        if (nivelDoUsuarioLogado == NivelDeAcesso.GM) {
-            return true;
-        }
-
-        return false;
+        return nivelDoUsuarioLogado.podeGerenciar(nivelDoUsuarioASerCriado);
     }
 }

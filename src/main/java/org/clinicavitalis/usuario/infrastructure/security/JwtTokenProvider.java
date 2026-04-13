@@ -5,6 +5,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import org.clinicavitalis.usuario.domain.entity.Usuario;
+import org.clinicavitalis.usuario.domain.port.TokenProvider;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
@@ -14,7 +15,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @ApplicationScoped
-public class JwtTokenProvider {
+public class JwtTokenProvider implements TokenProvider {
 
     @ConfigProperty(name = "jwt.secret", defaultValue = "ClinicaVitalisSecureJwtSecretKeyFor512BitHS512AlgorithmMinimumRequirement2024JwtSecret")
     String jwtSecret;

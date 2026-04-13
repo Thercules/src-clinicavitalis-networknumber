@@ -1,5 +1,8 @@
 package org.clinicavitalis.medico.domain.entity;
 
+import org.clinicavitalis.shared.domain.vo.Email;
+import org.clinicavitalis.shared.domain.vo.Endereco;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -20,14 +23,8 @@ public class Medico {
     private Sexo sexo;
     private String nacionalidade;
 
-    private String emailProfissional;
-
-    private String enderecoRua;
-    private String enderecoNumero;
-    private String enderecoBairro;
-    private String enderecoCidade;
-    private String enderecoEstado;
-    private String enderecoCep;
+    private Email emailProfissional;
+    private Endereco endereco;
 
     private List<String> especialidades;
     private String fotoUrl;
@@ -58,13 +55,8 @@ public class Medico {
             LocalDate dataNascimento,
             Sexo sexo,
             String nacionalidade,
-            String emailProfissional,
-            String enderecoRua,
-            String enderecoNumero,
-            String enderecoBairro,
-            String enderecoCidade,
-            String enderecoEstado,
-            String enderecoCep,
+            Email emailProfissional,
+            Endereco endereco,
             List<String> especialidades,
             String fotoUrl,
             String localizacao,
@@ -79,6 +71,9 @@ public class Medico {
             LocalDateTime dataAtualizacao,
             Boolean ativo) {
 
+        validarHorarios(horarioInicioManha, horarioFimManha, horarioInicioTarde, horarioFimTarde);
+        validarIntervalo(intervaloConsultaMinutos);
+
         Medico medico = new Medico();
         medico.id = id;
         medico.usuarioId = usuarioId;
@@ -91,12 +86,7 @@ public class Medico {
         medico.sexo = sexo;
         medico.nacionalidade = nacionalidade;
         medico.emailProfissional = emailProfissional;
-        medico.enderecoRua = enderecoRua;
-        medico.enderecoNumero = enderecoNumero;
-        medico.enderecoBairro = enderecoBairro;
-        medico.enderecoCidade = enderecoCidade;
-        medico.enderecoEstado = enderecoEstado;
-        medico.enderecoCep = enderecoCep;
+        medico.endereco = endereco;
         medico.especialidades = especialidades;
         medico.fotoUrl = fotoUrl;
         medico.localizacao = localizacao;
@@ -113,6 +103,33 @@ public class Medico {
         return medico;
     }
 
+    private static void validarHorarios(LocalTime inicioManha, LocalTime fimManha,
+            LocalTime inicioTarde, LocalTime fimTarde) {
+        if (inicioManha != null && fimManha != null && !inicioManha.isBefore(fimManha))
+            throw new org.clinicavitalis.medico.domain.exception.MedicoDomainException(
+                "Horário início manhã deve ser anterior ao fim manhã");
+        if (inicioTarde != null && fimTarde != null && !inicioTarde.isBefore(fimTarde))
+            throw new org.clinicavitalis.medico.domain.exception.MedicoDomainException(
+                "Horário início tarde deve ser anterior ao fim tarde");
+        if (fimManha != null && inicioTarde != null && !fimManha.isBefore(inicioTarde))
+            throw new org.clinicavitalis.medico.domain.exception.MedicoDomainException(
+                "Horário fim manhã deve ser anterior ao início tarde");
+    }
+
+    private static void validarIntervalo(int intervalo) {
+        if (intervalo <= 0)
+            throw new org.clinicavitalis.medico.domain.exception.MedicoDomainException(
+                "Intervalo de consulta deve ser maior que zero");
+    }
+
+    public boolean isCrmAtivo() {
+        return CrmSituacao.ATIVO == crmSituacao;
+    }
+
+    public LocalDate getDataLimiteAgendamento() {
+        return LocalDate.now().plusDays((long) semanasDisponibilidade * 7);
+    }
+
     public Long getId() { return id; }
     public Long getUsuarioId() { return usuarioId; }
     public String getNomeCompleto() { return nomeCompleto; }
@@ -123,13 +140,8 @@ public class Medico {
     public LocalDate getDataNascimento() { return dataNascimento; }
     public Sexo getSexo() { return sexo; }
     public String getNacionalidade() { return nacionalidade; }
-    public String getEmailProfissional() { return emailProfissional; }
-    public String getEnderecoRua() { return enderecoRua; }
-    public String getEnderecoNumero() { return enderecoNumero; }
-    public String getEnderecoBairro() { return enderecoBairro; }
-    public String getEnderecoCidade() { return enderecoCidade; }
-    public String getEnderecoEstado() { return enderecoEstado; }
-    public String getEnderecoCep() { return enderecoCep; }
+    public Email getEmailProfissional() { return emailProfissional; }
+    public Endereco getEndereco() { return endereco; }
     public List<String> getEspecialidades() { return especialidades; }
     public String getFotoUrl() { return fotoUrl; }
     public String getLocalizacao() { return localizacao; }

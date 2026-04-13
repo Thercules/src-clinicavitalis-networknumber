@@ -1,6 +1,8 @@
 package org.clinicavitalis.medico.infrastructure.persistence.entity;
 
 import jakarta.persistence.*;
+import org.clinicavitalis.medico.domain.entity.CrmSituacao;
+import org.clinicavitalis.medico.domain.entity.Sexo;
 import org.clinicavitalis.usuario.infrastructure.persistence.entity.UsuarioJpaEntity;
 
 import java.time.LocalDate;
@@ -34,7 +36,7 @@ public class MedicoJpaEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "crm_situacao", nullable = false)
-    private CrmSituacaoJpa crmSituacao;
+    private CrmSituacao crmSituacao;
 
     @Column(name = "crm_data_emissao", nullable = false)
     private LocalDate crmDataEmissao;
@@ -44,7 +46,7 @@ public class MedicoJpaEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "sexo", nullable = false)
-    private SexoJpa sexo;
+    private Sexo sexo;
 
     @Column(name = "nacionalidade", length = 100, nullable = false)
     private String nacionalidade;
@@ -113,14 +115,6 @@ public class MedicoJpaEntity {
 
     public MedicoJpaEntity() {}
 
-    public enum CrmSituacaoJpa {
-        ATIVO, SUSPENSO, CANCELADO, INATIVO
-    }
-
-    public enum SexoJpa {
-        MASCULINO, FEMININO, OUTRO
-    }
-
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
@@ -136,8 +130,8 @@ public class MedicoJpaEntity {
     public String getCrmEstado() { return crmEstado; }
     public void setCrmEstado(String crmEstado) { this.crmEstado = crmEstado; }
 
-    public CrmSituacaoJpa getCrmSituacao() { return crmSituacao; }
-    public void setCrmSituacao(CrmSituacaoJpa crmSituacao) { this.crmSituacao = crmSituacao; }
+    public CrmSituacao getCrmSituacao() { return crmSituacao; }
+    public void setCrmSituacao(CrmSituacao crmSituacao) { this.crmSituacao = crmSituacao; }
 
     public LocalDate getCrmDataEmissao() { return crmDataEmissao; }
     public void setCrmDataEmissao(LocalDate crmDataEmissao) { this.crmDataEmissao = crmDataEmissao; }
@@ -145,8 +139,8 @@ public class MedicoJpaEntity {
     public LocalDate getDataNascimento() { return dataNascimento; }
     public void setDataNascimento(LocalDate dataNascimento) { this.dataNascimento = dataNascimento; }
 
-    public SexoJpa getSexo() { return sexo; }
-    public void setSexo(SexoJpa sexo) { this.sexo = sexo; }
+    public Sexo getSexo() { return sexo; }
+    public void setSexo(Sexo sexo) { this.sexo = sexo; }
 
     public String getNacionalidade() { return nacionalidade; }
     public void setNacionalidade(String nacionalidade) { this.nacionalidade = nacionalidade; }

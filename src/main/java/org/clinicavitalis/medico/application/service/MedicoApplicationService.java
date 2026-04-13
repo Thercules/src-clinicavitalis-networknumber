@@ -5,11 +5,10 @@ import jakarta.inject.Inject;
 import org.clinicavitalis.medico.application.dto.MedicoResponse;
 import org.clinicavitalis.medico.domain.entity.Medico;
 import org.clinicavitalis.medico.domain.exception.MedicoDomainException;
-import org.clinicavitalis.medico.domain.service.MedicoDomainService;
+import org.clinicavitalis.medico.domain.service.MedicoService;
 import org.eclipse.microprofile.faulttolerance.CircuitBreaker;
 import org.eclipse.microprofile.faulttolerance.Fallback;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -17,7 +16,7 @@ import java.util.stream.Collectors;
 public class MedicoApplicationService {
 
     @Inject
-    MedicoDomainService medicoDomainService;
+    MedicoService medicoDomainService;
 
     @CircuitBreaker(requestVolumeThreshold = 4, failureRatio = 0.5, delay = 5000)
     @Fallback(fallbackMethod = "listarMedicosFallback")
@@ -42,7 +41,7 @@ public class MedicoApplicationService {
         response.setCrmEstado(medico.getCrmEstado());
         response.setCrmSituacao(medico.getCrmSituacao() != null ? medico.getCrmSituacao().name() : null);
         response.setCrmDataEmissao(medico.getCrmDataEmissao());
-        response.setEmailProfissional(medico.getEmailProfissional());
+        response.setEmailProfissional(medico.getEmailProfissional() != null ? medico.getEmailProfissional().getValue() : null);
         response.setEspecialidades(medico.getEspecialidades());
         response.setFotoUrl(medico.getFotoUrl());
         response.setLocalizacao(medico.getLocalizacao());
@@ -53,11 +52,7 @@ public class MedicoApplicationService {
         response.setHorarioFimTarde(medico.getHorarioFimTarde());
         response.setIntervaloConsultaMinutos(medico.getIntervaloConsultaMinutos());
         response.setAtivo(medico.getAtivo());
-
-        LocalDate dataLimite = LocalDate.now()
-                .plusDays((long) medico.getSemanasDisponibilidade() * 7);
-        response.setDataLimiteAgendamento(dataLimite);
-
+        response.setDataLimiteAgendamento(medico.getDataLimiteAgendamento());
         return response;
     }
 }

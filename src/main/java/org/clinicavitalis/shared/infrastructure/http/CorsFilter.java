@@ -10,7 +10,11 @@ import java.io.IOException;
 @Provider
 public class CorsFilter implements ContainerResponseFilter {
 
-    private static final String ALLOWED_ORIGINS = "http://localhost:5173,http://localhost:3001,http://localhost:8080";
+    private static final String[] ALLOWED_ORIGINS = {
+        "http://localhost:5173",
+        "http://localhost:3001",
+        "http://localhost:8080"
+    };
     private static final String ALLOWED_METHODS = "GET,POST,PUT,DELETE,OPTIONS,PATCH";
     private static final String ALLOWED_HEADERS = "Content-Type,Authorization";
 
@@ -31,6 +35,9 @@ public class CorsFilter implements ContainerResponseFilter {
     }
 
     private boolean isOriginAllowed(String origin) {
-        return ALLOWED_ORIGINS.contains(origin);
+        for (String allowed : ALLOWED_ORIGINS) {
+            if (allowed.equals(origin)) return true;
+        }
+        return false;
     }
 }

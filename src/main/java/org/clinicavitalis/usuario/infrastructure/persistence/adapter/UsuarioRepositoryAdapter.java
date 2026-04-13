@@ -53,14 +53,4 @@ public class UsuarioRepositoryAdapter implements UsuarioRepository {
         jpaRepository.flush();
         return UsuarioMapper.toDomain(updated);
     }
-
-    @Override
-    public void remover(Long id) {
-        jpaRepository.deleteById(id);
-    }
-
-    @Override
-    public void removerPorEmail(Email email) {
-        jpaRepository.delete("email", email.getValue());
-    }
 }
