@@ -20,6 +20,7 @@ import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
+import org.eclipse.microprofile.faulttolerance.CircuitBreaker;
 
 /**
  * Application Service: Autenticação
@@ -61,6 +62,15 @@ public class AutenticacaoApplicationService {
      * @return resposta com tokens e dados do usuário
      */
     @Transactional
+    @CircuitBreaker(
+        requestVolumeThreshold = 4,
+        failureRatio = 0.5,
+        delay = 5000,
+        skipOn = {
+            org.clinicavitalis.usuario.domain.exception.EmailAlreadyExistsException.class,
+            IllegalArgumentException.class
+        }
+    )
     public AuthTokenResponse registrar(@Valid @NotNull RegisterRequest request) {
         // Validações
         validarRegistro(request);
@@ -119,6 +129,16 @@ public class AutenticacaoApplicationService {
      * @return resposta com tokens e dados do usuário
      */
     @Transactional
+    @CircuitBreaker(
+        requestVolumeThreshold = 4,
+        failureRatio = 0.5,
+        delay = 5000,
+        skipOn = {
+            org.clinicavitalis.usuario.domain.exception.CredenciaisInvalidasException.class,
+            org.clinicavitalis.usuario.domain.exception.UsuarioDomainException.class,
+            org.clinicavitalis.shared.domain.exception.EntityNotFoundException.class
+        }
+    )
     public AuthTokenResponse login(@Valid @NotNull LoginRequest request) {
         // Busca usuário
         Email email = Email.of(request.getEmail());
@@ -158,6 +178,12 @@ public class AutenticacaoApplicationService {
      * @param refreshToken refresh token fornecido
      * @return novo access token
      */
+    @CircuitBreaker(
+        requestVolumeThreshold = 4,
+        failureRatio = 0.5,
+        delay = 5000,
+        skipOn = { org.clinicavitalis.usuario.domain.exception.UsuarioDomainException.class }
+    )
     public String renovarToken(String refreshToken) {
         // Valida refresh token
         if (!jwtTokenProvider.isTokenValid(refreshToken)) {
@@ -197,6 +223,16 @@ public class AutenticacaoApplicationService {
      * @return resposta com dados do usuário criado
      */
     @Transactional
+    @CircuitBreaker(
+        requestVolumeThreshold = 4,
+        failureRatio = 0.5,
+        delay = 5000,
+        skipOn = {
+            org.clinicavitalis.usuario.domain.exception.EmailAlreadyExistsException.class,
+            org.clinicavitalis.usuario.domain.exception.UsuarioDomainException.class,
+            IllegalArgumentException.class
+        }
+    )
     public UsuarioResponse criarUsuarioComNivel(
         @Valid @NotNull CreateUserRequest request,
         Long usuarioAutenticadoId,

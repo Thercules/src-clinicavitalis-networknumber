@@ -1,7 +1,9 @@
 package org.clinicavitalis.usuario.infrastructure.http;
 
 import org.clinicavitalis.shared.application.dto.ApiResponse;
+import org.clinicavitalis.shared.domain.exception.ServicoIndisponivelException;
 import org.clinicavitalis.usuario.application.dto.AuthTokenResponse;
+import org.eclipse.microprofile.faulttolerance.exceptions.CircuitBreakerOpenException;
 import org.clinicavitalis.usuario.application.dto.CreateUserRequest;
 import org.clinicavitalis.usuario.application.dto.LoginRequest;
 import org.clinicavitalis.usuario.application.dto.RegisterRequest;
@@ -94,6 +96,14 @@ public class AutenticacaoResource {
                 .entity(response)
                 .build();
 
+        } catch (CircuitBreakerOpenException | ServicoIndisponivelException e) {
+            ApiResponse<Object> response = ApiResponse.error(
+                "Serviço temporariamente indisponível. Tente novamente em instantes.");
+            return Response
+                .status(Response.Status.SERVICE_UNAVAILABLE)
+                .entity(response)
+                .build();
+
         } catch (Exception e) {
             ApiResponse<Object> response = ApiResponse.error(
                 "Erro ao fazer login: " + e.getMessage()
@@ -166,6 +176,14 @@ public class AutenticacaoResource {
                 .entity(response)
                 .build();
 
+        } catch (CircuitBreakerOpenException | ServicoIndisponivelException e) {
+            ApiResponse<Object> response = ApiResponse.error(
+                "Serviço temporariamente indisponível. Tente novamente em instantes.");
+            return Response
+                .status(Response.Status.SERVICE_UNAVAILABLE)
+                .entity(response)
+                .build();
+
         } catch (Exception e) {
             ApiResponse<Object> response = ApiResponse.error(
                 "Erro ao registrar usuário: " + e.getMessage()
@@ -221,6 +239,14 @@ public class AutenticacaoResource {
             ApiResponse<Object> response = ApiResponse.error(e.getMessage());
             return Response
                 .status(Response.Status.UNAUTHORIZED)
+                .entity(response)
+                .build();
+
+        } catch (CircuitBreakerOpenException | ServicoIndisponivelException e) {
+            ApiResponse<Object> response = ApiResponse.error(
+                "Serviço temporariamente indisponível. Tente novamente em instantes.");
+            return Response
+                .status(Response.Status.SERVICE_UNAVAILABLE)
                 .entity(response)
                 .build();
 
@@ -348,6 +374,14 @@ public class AutenticacaoResource {
             ApiResponse<Object> response = ApiResponse.error(e.getMessage());
             return Response
                 .status(Response.Status.BAD_REQUEST)
+                .entity(response)
+                .build();
+
+        } catch (CircuitBreakerOpenException | ServicoIndisponivelException e) {
+            ApiResponse<Object> response = ApiResponse.error(
+                "Serviço temporariamente indisponível. Tente novamente em instantes.");
+            return Response
+                .status(Response.Status.SERVICE_UNAVAILABLE)
                 .entity(response)
                 .build();
 
